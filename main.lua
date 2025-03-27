@@ -265,8 +265,6 @@ function DarkUI:Initialize()
 end
 
 function DarkUI:SwitchTab(tabIndex, noAnimation)
-    if self.currentTab == tabIndex then return end -- Skip if already on this tab
-    
     -- Update current tab
     self.currentTab = tabIndex
     local tab = self.config.tabs[tabIndex]
@@ -276,7 +274,7 @@ function DarkUI:SwitchTab(tabIndex, noAnimation)
     local tabButton = self.tabButtonsInstances[tabIndex]
     local tabButtonPos = tabButton.AbsolutePosition.X - self.mainFrame.AbsolutePosition.X
     
-    -- Animate the indicator to the correct position
+    -- Animate the indicator
     if noAnimation then
         self.tabIndicator.Position = UDim2.new(0, tabButtonPos, 1, -2)
         self.tabIndicator.BackgroundColor3 = tab.color
@@ -295,24 +293,22 @@ function DarkUI:SwitchTab(tabIndex, noAnimation)
     end
     tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     
-    -- Update content if content was set for this tab
+    -- Clear previous content by unparenting
+    for _, child in ipairs(self.contentFrame:GetChildren()) do
+        child.Parent = nil
+    end
+    
+    -- Add new content if available
     if self.contents[tabIndex] then
-        -- Clear previous content
-        for _, child in ipairs(self.contentFrame:GetChildren()) do
-            child:Destroy()
-        end
-        
-        -- Add the stored content
         self.contents[tabIndex].Parent = self.contentFrame
     end
 end
 
 function DarkUI:SetTabContent(tabIndex, content)
-    -- Store the content for this tab
     self.contents[tabIndex] = content
-    content.Parent = nil -- Remove from hierarchy for now
+    content.Parent = nil
     
-    -- If this is the current tab, show it immediately
+    -- Force refresh if it's the current tab
     if self.currentTab == tabIndex then
         self:SwitchTab(tabIndex, true)
     end
