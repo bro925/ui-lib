@@ -314,66 +314,87 @@ function DarkUI:SetTabContent(tabIndex, content)
     end
 end
 
--- Add this method to your DarkUI class
 function DarkUI:CreateCheckbox(label, initialState, callback)
     local checkboxFrame = Instance.new("Frame")
-    checkboxFrame.BackgroundTransparency = 1
-    checkboxFrame.Size = UDim2.new(1, -20, 0, 24)
+    checkboxFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+    checkboxFrame.Size = UDim2.new(1, -20, 0, 32)
     checkboxFrame.Position = UDim2.new(0, 10, 0, 0)
     
-    -- Toggle button
-    local toggleButton = Instance.new("Frame")
-    toggleButton.Name = "ToggleButton"
-    toggleButton.Size = UDim2.new(0, 18, 0, 18)
-    toggleButton.Position = UDim2.new(0, 0, 0.5, -9)
-    toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-    toggleButton.Active = true
-    
+    -- Rounded corners
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 4)
-    corner.Parent = toggleButton
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = checkboxFrame
     
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(100, 100, 120)
-    stroke.Thickness = 1
-    stroke.Parent = toggleButton
-    
-    -- Checkmark
-    local checkmark = Instance.new("TextLabel")
-    checkmark.Text = "✓"
-    checkmark.Visible = initialState
-    checkmark.TextColor3 = Color3.new(1, 1, 1)
-    checkmark.Size = UDim2.new(1, 0, 1, 0)
-    checkmark.BackgroundTransparency = 1
-    checkmark.TextSize = 14
-    checkmark.Font = Enum.Font.Gotham
-    checkmark.Parent = toggleButton
-    
-    -- Label
+    -- Label (left side)
     local labelText = Instance.new("TextLabel")
+    labelText.Name = "Label"
     labelText.Text = label
     labelText.TextColor3 = Color3.fromRGB(220, 220, 220)
     labelText.Font = Enum.Font.Gotham
     labelText.TextSize = 12
-    labelText.Size = UDim2.new(1, -25, 1, 0)
-    labelText.Position = UDim2.new(0, 25, 0, 0)
+    labelText.Size = UDim2.new(0.7, -10, 1, -10)
+    labelText.Position = UDim2.new(0, 10, 0.5, -10)
     labelText.TextXAlignment = Enum.TextXAlignment.Left
     labelText.BackgroundTransparency = 1
     labelText.Parent = checkboxFrame
     
-    toggleButton.Parent = checkboxFrame
+    -- Toggle container (right side)
+    local toggleContainer = Instance.new("Frame")
+    toggleContainer.Name = "ToggleContainer"
+    toggleContainer.BackgroundTransparency = 1
+    toggleContainer.Size = UDim2.new(0.3, -10, 1, -10)
+    toggleContainer.Position = UDim2.new(0.7, 0, 0.5, -10)
+    toggleContainer.AnchorPoint = Vector2.new(1, 0.5)
+    toggleContainer.Parent = checkboxFrame
+    
+    -- Toggle background
+    local toggleBackground = Instance.new("Frame")
+    toggleBackground.Name = "ToggleBackground"
+    toggleBackground.Size = UDim2.new(0, 40, 1, 0)
+    toggleBackground.Position = UDim2.new(1, 0, 0.5, 0)
+    toggleBackground.AnchorPoint = Vector2.new(1, 0.5)
+    toggleBackground.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+    toggleBackground.Parent = toggleContainer
+    
+    local bgCorner = Instance.new("UICorner")
+    bgCorner.CornerRadius = UDim.new(0, 12)
+    bgCorner.Parent = toggleBackground
+    
+    -- Toggle button
+    local toggleButton = Instance.new("Frame")
+    toggleButton.Name = "ToggleButton"
+    toggleButton.Size = UDim2.new(0, 16, 0, 16)
+    toggleButton.Position = initialState and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
+    toggleButton.AnchorPoint = Vector2.new(1, 0.5)
+    toggleButton.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+    toggleButton.Parent = toggleBackground
+    
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(1, 0)
+    buttonCorner.Parent = toggleButton
     
     local state = initialState or false
     local isHovered = false
     
     local function updateVisuals()
-        checkmark.Visible = state
+        local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        
         if state then
-            toggleButton.BackgroundColor3 = Color3.fromRGB(70, 130, 200)
-            stroke.Color = Color3.fromRGB(40, 90, 150)
+            TweenService:Create(toggleButton, tweenInfo, {
+                Position = UDim2.new(1, -18, 0.5, -8),
+                BackgroundColor3 = Color3.fromRGB(70, 130, 200)
+            }):Play()
+            TweenService:Create(toggleBackground, tweenInfo, {
+                BackgroundColor3 = Color3.fromRGB(70, 130, 200, 0.3)
+            }):Play()
         else
-            toggleButton.BackgroundColor3 = isHovered and Color3.fromRGB(60, 60, 70) or Color3.fromRGB(50, 50, 60)
-            stroke.Color = isHovered and Color3.fromRGB(120, 120, 140) or Color3.fromRGB(100, 100, 120)
+            TweenService:Create(toggleButton, tweenInfo, {
+                Position = UDim2.new(0, 2, 0.5, -8),
+                BackgroundColor3 = isHovered and Color3.fromRGB(180, 180, 180) or Color3.fromRGB(220, 220, 220)
+            }):Play()
+            TweenService:Create(toggleBackground, tweenInfo, {
+                BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+            }):Play()
         end
     end
     
