@@ -317,9 +317,9 @@ end
 function DarkUI:CreateCheckbox(label, initialState, callback)
     local checkboxFrame = Instance.new("Frame")
     checkboxFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
-    checkboxFrame.Size = UDim2.new(1, -5000, 0, 32) -- Wider negative padding for centering
-    checkboxFrame.Position = UDim2.new(0.5, 0, 0, 0) -- Centered horizontally
-    checkboxFrame.AnchorPoint = Vector2.new(0.5, 0) -- Center anchor
+    checkboxFrame.Size = UDim2.new(1, -20, 0, 32) -- Adjusted width to fit inside the tab container
+    checkboxFrame.Position = UDim2.new(0.5, 0, 0, 0)
+    checkboxFrame.AnchorPoint = Vector2.new(0.5, 0)
     
     -- Rounded corners
     local corner = Instance.new("UICorner")
