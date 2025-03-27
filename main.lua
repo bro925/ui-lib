@@ -124,7 +124,7 @@ function DarkUI:Initialize()
     tabBar.BackgroundColor3 = Color3.fromRGB(35, 35, 42)
     tabBar.BorderSizePixel = 0
     tabBar.Size = UDim2.new(1, 0, 0, 30)
-    tabBar.Position = UDim2.new(0, 0, 0, 30)
+    tabBar.Position = UDim2.new(0, 0, 0, 29)
     tabBar.Parent = self.mainFrame
 
     -- Tab Buttons Container
