@@ -317,56 +317,53 @@ end
 function DarkUI:CreateCheckbox(label, initialState, callback)
     local checkboxFrame = Instance.new("Frame")
     checkboxFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
-    checkboxFrame.Size = UDim2.new(1, -20, 0, 32)
-    checkboxFrame.Position = UDim2.new(0, 10, 0, 0)
+    checkboxFrame.Size = UDim2.new(1, -40, 0, 32) -- Wider negative padding for centering
+    checkboxFrame.Position = UDim2.new(0.5, 0, 0, 0) -- Centered horizontally
+    checkboxFrame.AnchorPoint = Vector2.new(0.5, 0) -- Center anchor
     
     -- Rounded corners
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 6)
     corner.Parent = checkboxFrame
     
-    -- Label (left side)
+    -- Label (left aligned)
     local labelText = Instance.new("TextLabel")
-    labelText.Name = "Label"
     labelText.Text = label
     labelText.TextColor3 = Color3.fromRGB(220, 220, 220)
     labelText.Font = Enum.Font.Gotham
     labelText.TextSize = 12
-    labelText.Size = UDim2.new(0.7, -10, 1, -10)
-    labelText.Position = UDim2.new(0, 10, 0.5, -10)
+    labelText.Size = UDim2.new(0.6, -10, 1, -10)
+    labelText.Position = UDim2.new(0, 15, 0.5, -10)
     labelText.TextXAlignment = Enum.TextXAlignment.Left
     labelText.BackgroundTransparency = 1
     labelText.Parent = checkboxFrame
     
-    -- Toggle container (right side)
+    -- Toggle container (right aligned)
     local toggleContainer = Instance.new("Frame")
-    toggleContainer.Name = "ToggleContainer"
     toggleContainer.BackgroundTransparency = 1
-    toggleContainer.Size = UDim2.new(0.3, -10, 1, -10)
-    toggleContainer.Position = UDim2.new(0.7, 0, 0.5, -10)
-    toggleContainer.AnchorPoint = Vector2.new(1, 0.5)
+    toggleContainer.Size = UDim2.new(0.4, 0, 1, 0)
+    toggleContainer.Position = UDim2.new(1, -15, 0, 0)
+    toggleContainer.AnchorPoint = Vector2.new(1, 0)
     toggleContainer.Parent = checkboxFrame
     
     -- Toggle background
     local toggleBackground = Instance.new("Frame")
-    toggleBackground.Name = "ToggleBackground"
-    toggleBackground.Size = UDim2.new(0, 40, 1, 0)
+    toggleBackground.Size = UDim2.new(0, 40, 0, 20)
     toggleBackground.Position = UDim2.new(1, 0, 0.5, 0)
     toggleBackground.AnchorPoint = Vector2.new(1, 0.5)
     toggleBackground.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
     toggleBackground.Parent = toggleContainer
     
     local bgCorner = Instance.new("UICorner")
-    bgCorner.CornerRadius = UDim.new(0, 12)
+    bgCorner.CornerRadius = UDim.new(1, 0)
     bgCorner.Parent = toggleBackground
     
-    -- Toggle button
+    -- Toggle knob (always white)
     local toggleButton = Instance.new("Frame")
-    toggleButton.Name = "ToggleButton"
     toggleButton.Size = UDim2.new(0, 16, 0, 16)
-    toggleButton.Position = initialState and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
-    toggleButton.AnchorPoint = Vector2.new(1, 0.5)
-    toggleButton.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+    toggleButton.AnchorPoint = Vector2.new(0, 0.5)
+    toggleButton.Position = initialState and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
+    toggleButton.BackgroundColor3 = Color3.new(1, 1, 1) -- Always white
     toggleButton.Parent = toggleBackground
     
     local buttonCorner = Instance.new("UICorner")
@@ -379,21 +376,20 @@ function DarkUI:CreateCheckbox(label, initialState, callback)
     local function updateVisuals()
         local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         
+        -- Animate knob position and background color
         if state then
             TweenService:Create(toggleButton, tweenInfo, {
-                Position = UDim2.new(1, -18, 0.5, -8),
-                BackgroundColor3 = Color3.fromRGB(70, 130, 200)
+                Position = UDim2.new(1, -18, 0.5, 0)
             }):Play()
             TweenService:Create(toggleBackground, tweenInfo, {
-                BackgroundColor3 = Color3.fromRGB(70, 130, 200, 0.3)
+                BackgroundColor3 = Color3.fromRGB(70, 130, 200)
             }):Play()
         else
             TweenService:Create(toggleButton, tweenInfo, {
-                Position = UDim2.new(0, 2, 0.5, -8),
-                BackgroundColor3 = isHovered and Color3.fromRGB(180, 180, 180) or Color3.fromRGB(220, 220, 220)
+                Position = UDim2.new(0, 2, 0.5, 0)
             }):Play()
             TweenService:Create(toggleBackground, tweenInfo, {
-                BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+                BackgroundColor3 = isHovered and Color3.fromRGB(70, 70, 80) or Color3.fromRGB(50, 50, 60)
             }):Play()
         end
     end
