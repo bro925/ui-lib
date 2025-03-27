@@ -318,6 +318,109 @@ function DarkUI:SetTabContent(tabIndex, content)
     end
 end
 
+-- Add this method to your DarkUI class
+function DarkUI:CreateCheckbox(label, initialState, callback)
+    local checkboxFrame = Instance.new("Frame")
+    checkboxFrame.BackgroundTransparency = 1
+    checkboxFrame.Size = UDim2.new(1, -20, 0, 24)
+    checkboxFrame.Position = UDim2.new(0, 10, 0, 0)
+    
+    -- Toggle button
+    local toggleButton = Instance.new("Frame")
+    toggleButton.Name = "ToggleButton"
+    toggleButton.Size = UDim2.new(0, 18, 0, 18)
+    toggleButton.Position = UDim2.new(0, 0, 0.5, -9)
+    toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+    toggleButton.Active = true
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = toggleButton
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(100, 100, 120)
+    stroke.Thickness = 1
+    stroke.Parent = toggleButton
+    
+    -- Checkmark
+    local checkmark = Instance.new("TextLabel")
+    checkmark.Text = "✓"
+    checkmark.Visible = initialState
+    checkmark.TextColor3 = Color3.new(1, 1, 1)
+    checkmark.Size = UDim2.new(1, 0, 1, 0)
+    checkmark.BackgroundTransparency = 1
+    checkmark.TextSize = 14
+    checkmark.Font = Enum.Font.Gotham
+    checkmark.Parent = toggleButton
+    
+    -- Label
+    local labelText = Instance.new("TextLabel")
+    labelText.Text = label
+    labelText.TextColor3 = Color3.fromRGB(220, 220, 220)
+    labelText.Font = Enum.Font.Gotham
+    labelText.TextSize = 12
+    labelText.Size = UDim2.new(1, -25, 1, 0)
+    labelText.Position = UDim2.new(0, 25, 0, 0)
+    labelText.TextXAlignment = Enum.TextXAlignment.Left
+    labelText.BackgroundTransparency = 1
+    labelText.Parent = checkboxFrame
+    
+    toggleButton.Parent = checkboxFrame
+    
+    local state = initialState or false
+    local isHovered = false
+    
+    local function updateVisuals()
+        checkmark.Visible = state
+        if state then
+            toggleButton.BackgroundColor3 = Color3.fromRGB(70, 130, 200)
+            stroke.Color = Color3.fromRGB(40, 90, 150)
+        else
+            toggleButton.BackgroundColor3 = isHovered and Color3.fromRGB(60, 60, 70) or Color3.fromRGB(50, 50, 60)
+            stroke.Color = isHovered and Color3.fromRGB(120, 120, 140) or Color3.fromRGB(100, 100, 120)
+        end
+    end
+    
+    local function toggle()
+        state = not state
+        updateVisuals()
+        if callback then
+            callback(state)
+        end
+    end
+    
+    -- Mouse interactions
+    checkboxFrame.MouseEnter:Connect(function()
+        isHovered = true
+        updateVisuals()
+    end)
+    
+    checkboxFrame.MouseLeave:Connect(function()
+        isHovered = false
+        updateVisuals()
+    end)
+    
+    checkboxFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            toggle()
+        end
+    end)
+    
+    updateVisuals()
+    
+    return {
+        instance = checkboxFrame,
+        GetState = function() return state end,
+        SetState = function(newState)
+            state = newState
+            updateVisuals()
+            if callback then
+                callback(state)
+            end
+        end
+    }
+end
+
 function DarkUI:ToggleMinimize()
     self.minimized = not self.minimized
     local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
