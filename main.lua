@@ -437,7 +437,7 @@ end
 function DarkUI:CreateSlider(name, minValue, maxValue, defaultValue, callback)
     local sliderFrame = Instance.new("Frame")
     sliderFrame.BackgroundTransparency = 1
-    sliderFrame.Size = UDim2.new(1, 0, 0, 60)
+    sliderFrame.Size = UDim2.new(1, -40, 0, 50) -- Reduced total height
     sliderFrame.Position = UDim2.new(0.5, 0, 0, 0)
     sliderFrame.AnchorPoint = Vector2.new(0.5, 0)
 
@@ -464,11 +464,11 @@ function DarkUI:CreateSlider(name, minValue, maxValue, defaultValue, callback)
     valueLabel.BackgroundTransparency = 1
     valueLabel.Parent = sliderFrame
 
-    -- Slider track
+    -- Slider track (moved closer to labels)
     local trackFrame = Instance.new("Frame")
     trackFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
-    trackFrame.Size = UDim2.new(1, 0, 0, 8)
-    trackFrame.Position = UDim2.new(0, 0, 0, 30)
+    trackFrame.Size = UDim2.new(1, 0, 0, 6) -- Thinner track
+    trackFrame.Position = UDim2.new(0, 0, 0, 25) -- Moved up 5 pixels
     trackFrame.Parent = sliderFrame
 
     local trackCorner = Instance.new("UICorner")
@@ -477,7 +477,7 @@ function DarkUI:CreateSlider(name, minValue, maxValue, defaultValue, callback)
 
     -- Fill bar
     local fillFrame = Instance.new("Frame")
-    fillFrame.BackgroundColor3 = self.config.tabs[1].color 
+    fillFrame.BackgroundColor3 = self.config.tabs[1].color
     fillFrame.Size = UDim2.new((defaultValue - minValue)/(maxValue - minValue), 0, 1, 0)
     fillFrame.Parent = trackFrame
 
@@ -485,12 +485,12 @@ function DarkUI:CreateSlider(name, minValue, maxValue, defaultValue, callback)
     fillCorner.CornerRadius = UDim.new(1, 0)
     fillCorner.Parent = fillFrame
 
-    -- Slider button
+    -- Slider button (fixed positioning)
     local sliderButton = Instance.new("Frame")
     sliderButton.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
     sliderButton.Size = UDim2.new(0, 16, 0, 16)
-    sliderButton.Position = UDim2.new(fillFrame.Size.X.Scale, -8, 0.5, -8)
-    sliderButton.AnchorPoint = Vector2.new(0, 0.5)
+    sliderButton.Position = UDim2.new(fillFrame.Size.X.Scale, -8, 0, -5) -- Adjusted Y position
+    sliderButton.AnchorPoint = Vector2.new(0, 0)
     sliderButton.Parent = trackFrame
 
     local buttonCorner = Instance.new("UICorner")
@@ -509,7 +509,7 @@ function DarkUI:CreateSlider(name, minValue, maxValue, defaultValue, callback)
         }):Play()
         
         TweenService:Create(sliderButton, TweenInfo.new(0.1), {
-            Position = UDim2.new(fillWidth, -8, 0.5, -8)
+            Position = UDim2.new(fillWidth, -8, 0, -5)
         }):Play()
         
         valueLabel.Text = string.format("%.2f", currentValue)
