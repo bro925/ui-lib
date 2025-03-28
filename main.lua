@@ -437,7 +437,7 @@ end
 function DarkUI:CreateSlider(name, minValue, maxValue, defaultValue, callback)
     local sliderFrame = Instance.new("Frame")
     sliderFrame.BackgroundTransparency = 1
-    sliderFrame.Size = UDim2.new(1, 0, 0, 35)
+    sliderFrame.Size = UDim2.new(1, 20, 0, 35)
     sliderFrame.Position = UDim2.new(0.5, 0, 0, 0)
     sliderFrame.AnchorPoint = Vector2.new(0.5, 0)
 
