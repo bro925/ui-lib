@@ -5,6 +5,28 @@ DarkUI.__index = DarkUI
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
+local Tab = {}
+Tab.__index = Tab
+
+function Tab.new(darkUI, scrollFrame)
+    local self = setmetatable({}, Tab)
+    self.darkUI = darkUI
+    self.ContentFrame = scrollFrame
+    return self
+end
+
+function Tab:CreateCheckbox(...)
+    return self.darkUI:CreateCheckbox(self.ContentFrame, ...)
+end
+
+function Tab:CreateSlider(...)
+    return self.darkUI:CreateSlider(self.ContentFrame, ...)
+end
+
+function Tab:CreateButton(...)
+    return self.darkUI:CreateButton(self.ContentFrame, ...)
+end
+
 function DarkUI.new(config)
     local self = setmetatable({}, DarkUI)
     
@@ -154,14 +176,40 @@ function DarkUI:Initialize()
     tabIndicatorCorner.CornerRadius = UDim.new(0, 2)
     tabIndicatorCorner.Parent = self.tabIndicator
 
-    -- Content Area
     self.contentFrame = Instance.new("Frame")
     self.contentFrame.Name = "ContentFrame"
-    self.contentFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 36)
-    self.contentFrame.BorderSizePixel = 0
+    self.contentFrame.BackgroundTransparency = 1
     self.contentFrame.Size = UDim2.new(1, 0, 1, -60)
     self.contentFrame.Position = UDim2.new(0, 0, 0, 60)
     self.contentFrame.Parent = self.mainFrame
+    
+    self.tabs = {}
+    for i, tabConfig in ipairs(self.config.tabs) do
+        local scrollFrame = Instance.new("ScrollingFrame")
+        scrollFrame.Name = tabConfig.name.."Content"
+        scrollFrame.Size = UDim2.new(1, 0, 1, 0)
+        scrollFrame.Position = UDim2.new(0, 0, 0, 0)
+        scrollFrame.BackgroundTransparency = 1
+        scrollFrame.ScrollBarThickness = 5
+        scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        scrollFrame.ScrollingDirection = Enum.ScrollingDirection.Y
+        scrollFrame.Visible = i == 1
+        scrollFrame.Parent = self.contentFrame
+    
+        local listLayout = Instance.new("UIListLayout")
+        listLayout.Padding = UDim.new(0, 10)
+        listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        listLayout.Parent = scrollFrame
+    
+        local padding = Instance.new("UIPadding")
+        padding.PaddingLeft = UDim.new(0, 15)
+        padding.PaddingRight = UDim.new(0, 15)
+        padding.PaddingTop = UDim.new(0, 15)
+        padding.PaddingBottom = UDim.new(0, 15)
+        padding.Parent = scrollFrame
+    
+        self.tabs[i] = Tab.new(self, scrollFrame)
+    end
 
     -- Create tab buttons
     for i, tab in ipairs(self.config.tabs) do
@@ -293,10 +341,10 @@ function DarkUI:SwitchTab(tabIndex, noAnimation)
     end
     tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     
-    -- Clear previous content by unparenting
-    for _, child in ipairs(self.contentFrame:GetChildren()) do
-        child.Parent = nil
+    for _, tab in ipairs(self.tabs) do
+        tab.ContentFrame.Visible = false
     end
+    self.tabs[tabIndex].ContentFrame.Visible = true
     
     -- Add new content if available
     if self.contents[tabIndex] then
@@ -304,13 +352,15 @@ function DarkUI:SwitchTab(tabIndex, noAnimation)
     end
 end
 
-function DarkUI:SetTabContent(tabIndex, content)
-    self.contents[tabIndex] = content
-    content.Parent = nil
-    
-    -- Force refresh if it's the current tab
-    if self.currentTab == tabIndex then
-        self:SwitchTab(tabIndex, true)
+function DarkUI:GetTab(indexOrName)
+    if type(indexOrName) == "number" then
+        return self.tabs[indexOrName]
+    else
+        for _, tab in ipairs(self.tabs) do
+            if tab.ContentFrame.Name:find(indexOrName) then
+                return tab
+            end
+        end
     end
 end
 
@@ -432,6 +482,9 @@ function DarkUI:CreateCheckbox(label, initialState, callback)
             end
         end
     }
+
+    checkboxFrame.Parent = parent
+    return { /* existing return structure */ }
 end
 
 function DarkUI:CreateSlider(name, minValue, maxValue, defaultValue, callback)
@@ -545,6 +598,9 @@ function DarkUI:CreateSlider(name, minValue, maxValue, defaultValue, callback)
             updateValue(newValue)
         end
     }
+
+    sliderFrame.Parent = parent
+    return { /* existing return structure */ }
 end
 
 function DarkUI:CreateButton(label, callback)
@@ -652,6 +708,9 @@ function DarkUI:CreateButton(label, callback)
             callback = newCallback
         end
     }
+
+    buttonFrame.Parent = parent
+    return { /* existing return structure */ }
 end
 
 function DarkUI:ToggleMinimize()
