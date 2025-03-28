@@ -437,7 +437,7 @@ end
 function DarkUI:CreateButton(label, callback)
     local buttonFrame = Instance.new("Frame")
     buttonFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
-    buttonFrame.Size = UDim2.new(1, -40, 0, 30) -- Slightly smaller Y size
+    buttonFrame.Size = UDim2.new(1, 0, 0, 30) -- Slightly smaller Y size
     buttonFrame.Position = UDim2.new(0.5, 0, 0, 0)
     buttonFrame.AnchorPoint = Vector2.new(0.5, 0)
     buttonFrame.ClipsDescendants = true
