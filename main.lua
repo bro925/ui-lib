@@ -434,10 +434,123 @@ function DarkUI:CreateCheckbox(label, initialState, callback)
     }
 end
 
+function DarkUI:CreateSlider(name, minValue, maxValue, defaultValue, callback)
+    local sliderFrame = Instance.new("Frame")
+    sliderFrame.BackgroundTransparency = 1
+    sliderFrame.Size = UDim2.new(1, 0, 0, 60)
+    sliderFrame.Position = UDim2.new(0.5, 0, 0, 0)
+    sliderFrame.AnchorPoint = Vector2.new(0.5, 0)
+
+    -- Labels
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Text = name
+    nameLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+    nameLabel.Font = Enum.Font.Gotham
+    nameLabel.TextSize = 12
+    nameLabel.Size = UDim2.new(0.5, -10, 0, 20)
+    nameLabel.Position = UDim2.new(0, 0, 0, 0)
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Parent = sliderFrame
+
+    local valueLabel = Instance.new("TextLabel")
+    valueLabel.Text = tostring(defaultValue)
+    valueLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    valueLabel.Font = Enum.Font.Gotham
+    valueLabel.TextSize = 12
+    valueLabel.Size = UDim2.new(0.5, -10, 0, 20)
+    valueLabel.Position = UDim2.new(0.5, 0, 0, 0)
+    valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+    valueLabel.BackgroundTransparency = 1
+    valueLabel.Parent = sliderFrame
+
+    -- Slider track
+    local trackFrame = Instance.new("Frame")
+    trackFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+    trackFrame.Size = UDim2.new(1, 0, 0, 8)
+    trackFrame.Position = UDim2.new(0, 0, 0, 30)
+    trackFrame.Parent = sliderFrame
+
+    local trackCorner = Instance.new("UICorner")
+    trackCorner.CornerRadius = UDim.new(1, 0)
+    trackCorner.Parent = trackFrame
+
+    -- Fill bar
+    local fillFrame = Instance.new("Frame")
+    fillFrame.BackgroundColor3 = self.config.tabs[1].color 
+    fillFrame.Size = UDim2.new((defaultValue - minValue)/(maxValue - minValue), 0, 1, 0)
+    fillFrame.Parent = trackFrame
+
+    local fillCorner = Instance.new("UICorner")
+    fillCorner.CornerRadius = UDim.new(1, 0)
+    fillCorner.Parent = fillFrame
+
+    -- Slider button
+    local sliderButton = Instance.new("Frame")
+    sliderButton.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+    sliderButton.Size = UDim2.new(0, 16, 0, 16)
+    sliderButton.Position = UDim2.new(fillFrame.Size.X.Scale, -8, 0.5, -8)
+    sliderButton.AnchorPoint = Vector2.new(0, 0.5)
+    sliderButton.Parent = trackFrame
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(1, 0)
+    buttonCorner.Parent = sliderButton
+
+    local isDragging = false
+    local currentValue = defaultValue
+
+    local function updateValue(newValue)
+        currentValue = math.clamp(newValue, minValue, maxValue)
+        local fillWidth = (currentValue - minValue)/(maxValue - minValue)
+        
+        TweenService:Create(fillFrame, TweenInfo.new(0.1), {
+            Size = UDim2.new(fillWidth, 0, 1, 0)
+        }):Play()
+        
+        TweenService:Create(sliderButton, TweenInfo.new(0.1), {
+            Position = UDim2.new(fillWidth, -8, 0.5, -8)
+        }):Play()
+        
+        valueLabel.Text = string.format("%.2f", currentValue)
+        if callback then callback(currentValue) end
+    end
+
+    -- Input handling
+    trackFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = true
+            local xOffset = (input.Position.X - trackFrame.AbsolutePosition.X) / trackFrame.AbsoluteSize.X
+            updateValue(minValue + (maxValue - minValue) * xOffset)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local xOffset = (input.Position.X - trackFrame.AbsolutePosition.X) / trackFrame.AbsoluteSize.X
+            updateValue(minValue + (maxValue - minValue) * xOffset)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = false
+        end
+    end)
+
+    return {
+        instance = sliderFrame,
+        GetValue = function() return currentValue end,
+        SetValue = function(newValue)
+            updateValue(newValue)
+        end
+    }
+end
+
 function DarkUI:CreateButton(label, callback)
     local buttonFrame = Instance.new("Frame")
     buttonFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
-    buttonFrame.Size = UDim2.new(1, 0, 0, 35) -- Slightly smaller Y size
+    buttonFrame.Size = UDim2.new(1, 0, 0, 35)
     buttonFrame.Position = UDim2.new(0.5, 0, 0, 0)
     buttonFrame.AnchorPoint = Vector2.new(0.5, 0)
     buttonFrame.ClipsDescendants = true
