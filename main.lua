@@ -434,6 +434,113 @@ function DarkUI:CreateCheckbox(label, initialState, callback)
     }
 end
 
+function DarkUI:CreateButton(label, callback)
+    local buttonFrame = Instance.new("Frame")
+    buttonFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+    buttonFrame.Size = UDim2.new(1, -40, 0, 30) -- Slightly smaller Y size
+    buttonFrame.Position = UDim2.new(0.5, 0, 0, 0)
+    buttonFrame.AnchorPoint = Vector2.new(0.5, 0)
+    buttonFrame.ClipsDescendants = true
+    
+    -- Rounded corners
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = buttonFrame
+    
+    -- Button label
+    local labelText = Instance.new("TextLabel")
+    labelText.Text = label
+    labelText.TextColor3 = Color3.fromRGB(220, 220, 220)
+    labelText.Font = Enum.Font.Gotham
+    labelText.TextSize = 12
+    labelText.Size = UDim2.new(1, -20, 1, 0)
+    labelText.Position = UDim2.new(0.5, 0, 0.5, 0)
+    labelText.AnchorPoint = Vector2.new(0.5, 0.5)
+    labelText.TextXAlignment = Enum.TextXAlignment.Center
+    labelText.BackgroundTransparency = 1
+    labelText.Parent = buttonFrame
+    
+    -- Interaction states
+    local isHovered = false
+    local isPressed = false
+    
+    -- Ripple effect function
+    local function createRipple(input)
+        local ripple = Instance.new("Frame")
+        ripple.BackgroundColor3 = Color3.new(1, 1, 1)
+        ripple.BackgroundTransparency = 0.8
+        ripple.Size = UDim2.new(0, 0, 0, 0)
+        ripple.Position = UDim2.new(
+            (input.Position.X - buttonFrame.AbsolutePosition.X) / buttonFrame.AbsoluteSize.X,
+            (input.Position.Y - buttonFrame.AbsolutePosition.Y) / buttonFrame.AbsoluteSize.Y,
+            0, 0
+        )
+        ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+        ripple.Parent = buttonFrame
+        
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = ripple
+        
+        TweenService:Create(ripple, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(2, 0, 2, 0),
+            BackgroundTransparency = 1
+        }):Play()
+        
+        delay(0.7, function()
+            ripple:Destroy()
+        end)
+    end
+    
+    -- Mouse interactions
+    buttonFrame.MouseEnter:Connect(function()
+        isHovered = true
+        TweenService:Create(buttonFrame, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(45, 45, 54)
+        }):Play()
+    end)
+    
+    buttonFrame.MouseLeave:Connect(function()
+        isHovered = false
+        TweenService:Create(buttonFrame, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+        }):Play()
+    end)
+    
+    buttonFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isPressed = true
+            createRipple(input)
+            TweenService:Create(buttonFrame, TweenInfo.new(0.1), {
+                BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+            }):Play()
+        end
+    end)
+    
+    buttonFrame.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isPressed = false
+            TweenService:Create(buttonFrame, TweenInfo.new(0.15), {
+                BackgroundColor3 = isHovered and Color3.fromRGB(45, 45, 54) or Color3.fromRGB(40, 40, 48)
+            }):Play()
+            
+            if callback then
+                callback()
+            end
+        end
+    end)
+    
+    return {
+        instance = buttonFrame,
+        SetText = function(newText)
+            labelText.Text = newText
+        end,
+        SetCallback = function(newCallback)
+            callback = newCallback
+        end
+    }
+end
+
 function DarkUI:ToggleMinimize()
     self.minimized = not self.minimized
     local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
