@@ -1,4 +1,5 @@
 local UI = {}
+local UserInputService = game:GetService("UserInputService")
 
 function UI.Create(title)
     title = title
@@ -72,7 +73,6 @@ function UI.Create(title)
     local Tabs = {}
     local currentTab
 
-    -- Dragging Logic
     local dragging
     local dragInput
     local dragStart
@@ -80,7 +80,12 @@ function UI.Create(title)
 
     local function Update(input)
         local delta = input.Position - dragStart
-        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        Main.Position = UDim2.new(
+            startPos.X.Scale, 
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale, 
+            startPos.Y.Offset + delta.Y
+        )
     end
 
     Drag.InputBegan:Connect(function(input)
