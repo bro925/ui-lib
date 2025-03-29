@@ -232,23 +232,29 @@ function Library.new(titleText)
             return label
         end
         
-        function tab:AddSection(title)
+        function tab:AddSection(titleText)
             local section = Instance.new("Frame")
+            local sectionLayout = Instance.new("UIListLayout")
             local sectionTitle = Instance.new("TextLabel")
             local divider = Instance.new("Frame")
             
             section.Name = "Section"
             section.Parent = TabContainer
             section.BackgroundTransparency = 1
-            section.Size = UDim2.new(1, 0, 0, 40)
+            section.Size = UDim2.new(1, 0, 0, 20)
+            
+            sectionLayout.Parent = section
+            sectionLayout.FillDirection = Enum.FillDirection.Horizontal
+            sectionLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+            sectionLayout.Padding = UDim.new(0, 5)
             
             sectionTitle.Name = "Title"
             sectionTitle.Parent = section
             sectionTitle.BackgroundTransparency = 1
-            sectionTitle.Position = UDim2.new(0, 0, 0, 0)
-            sectionTitle.Size = UDim2.new(1, 0, 0, 20)
+            sectionTitle.Size = UDim2.new(0, 0, 0, 20)
+            sectionTitle.AutomaticSize = Enum.AutomaticSize.X
             sectionTitle.Font = Enum.Font.Gotham
-            sectionTitle.Text = title
+            sectionTitle.Text = titleText
             sectionTitle.TextColor3 = Color3.fromRGB(150, 150, 150)
             sectionTitle.TextSize = 12
             sectionTitle.TextXAlignment = Enum.TextXAlignment.Left
@@ -257,7 +263,6 @@ function Library.new(titleText)
             divider.Parent = section
             divider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
             divider.BorderSizePixel = 0
-            divider.Position = UDim2.new(0, 0, 0, 25)
             divider.Size = UDim2.new(1, 0, 0, 1)
             
             return section
@@ -348,7 +353,7 @@ function Library.new(titleText)
             
             thumb.Name = "Thumb"
             thumb.Parent = track
-            thumb.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+            thumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Changed to white
             thumb.BorderSizePixel = 0
             thumb.Position = UDim2.new(0, 0, -1, 0)
             thumb.Size = UDim2.new(0, 15, 2, 0)
@@ -367,8 +372,10 @@ function Library.new(titleText)
             
             local connection
             local currentValue = min
-            
+            local dragging = false -- Added drag state tracking
+    
             local function updateValue(input)
+                if not dragging then return end
                 local x = (input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X
                 x = math.clamp(x, 0, 1)
                 local value = math.floor(min + (max - min) * x)
@@ -383,11 +390,12 @@ function Library.new(titleText)
             
             thumb.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                    updateValue(input)
                     connection = input.Changed:Connect(function()
                         if input.UserInputState == Enum.UserInputState.End then
+                            dragging = false
                             connection:Disconnect()
-                        else
-                            updateValue(input)
                         end
                     end)
                 end
